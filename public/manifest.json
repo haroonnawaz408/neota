@@ -1,0 +1,17 @@
+{
+  "name": "NEOTA — Digital Wedding Ledger",
+  "short_name": "NEOTA",
+  "description": "Pakistan's Premier Digital Wedding Ledger (نیوتا و سلامی کتاب)",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#F7F3EB",
+  "theme_color": "#654B3B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
