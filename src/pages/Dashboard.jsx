@@ -21,6 +21,15 @@ export default function Dashboard() {
   const totalReturned = returns.reduce((s, t) => s + (Number(t.amount) || 0), 0)
   const netCashFlow = totalReceived - totalReturned
 
+  // Real today calculations
+  const todayStr = new Date().toISOString().split('T')[0]
+  const todayRec = rec.filter(t => (t.at || '').startsWith(todayStr))
+  const todayGuests = guests.filter(p => (p.createdAt || '').startsWith(todayStr))
+  const todayReturned = returns.filter(t => (t.at || '').startsWith(todayStr))
+  const todayRecAmount = todayRec.reduce((s, t) => s + (Number(t.amount) || 0), 0)
+  const todayRetAmount = todayReturned.reduce((s, t) => s + (Number(t.amount) || 0), 0)
+  const todayNet = todayRecAmount - todayRetAmount
+
   // Ensure activeEvent state is initialized safely
   useEffect(() => {
     if (!activeEvent && currentEvent?.id) {
@@ -31,8 +40,8 @@ export default function Dashboard() {
   const userName = auth.user?.name?.split(' ')[0] || auth.user?.email?.split('@')[0] || 'Haroon'
 
   // Completion calculation
-  const totalCapacity = currentEvent?.capacity || (guests.length > 0 ? Math.max(guests.length, 300) : 300)
-  const completionPct = guests.length > 0 ? Math.min(Math.round((rec.length / guests.length) * 100), 100) : 76
+  const totalCapacity = currentEvent?.capacity || (guests.length > 0 ? guests.length : 100)
+  const completionPct = guests.length > 0 ? Math.min(Math.round((rec.length / guests.length) * 100), 100) : 0
 
   if (events.length === 0) {
     return (
@@ -112,7 +121,7 @@ export default function Dashboard() {
             <div>
               <span className="text-xs font-semibold text-[#77776D] block">Total Guests</span>
               <p className="font-serif text-2xl md:text-3xl font-bold text-[#252A26] mt-1">
-                {guests.length > 0 ? guests.length : 248}
+                {guests.length}
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#F3EBDD] flex items-center justify-center text-[#153C32] shrink-0">
@@ -120,7 +129,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-[#287A50]">
-            <span>↑ 12 today</span>
+            <span>{todayGuests.length > 0 ? `↑ ${todayGuests.length} today` : `${guests.length} total registered`}</span>
           </div>
         </div>
 
@@ -130,7 +139,7 @@ export default function Dashboard() {
             <div>
               <span className="text-xs font-semibold text-[#77776D] block">Total Received</span>
               <p className="font-serif text-2xl md:text-3xl font-bold text-[#252A26] mt-1">
-                {totalReceived > 0 ? pkr(totalReceived) : 'Rs 3,750,000'}
+                {pkr(totalReceived)}
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#F3EBDD] flex items-center justify-center text-[#153C32] shrink-0">
@@ -138,7 +147,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-[#287A50]">
-            <span>↑ Rs 250,000 today</span>
+            <span>{todayRecAmount > 0 ? `↑ ${pkr(todayRecAmount)} today` : `${rec.length} gifts recorded`}</span>
           </div>
         </div>
 
@@ -148,15 +157,15 @@ export default function Dashboard() {
             <div>
               <span className="text-xs font-semibold text-[#77776D] block">Total Returned</span>
               <p className="font-serif text-2xl md:text-3xl font-bold text-[#252A26] mt-1">
-                {totalReturned > 0 ? pkr(totalReturned) : 'Rs 120,000'}
+                {pkr(totalReturned)}
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#F3EBDD] flex items-center justify-center text-[#153C32] shrink-0">
               <Undo2 size={20} className="text-[#C7A56A]" />
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-[#287A50]">
-            <span>↑ Rs 20,000 today</span>
+          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-[#77776D]">
+            <span>{todayRetAmount > 0 ? `↑ ${pkr(todayRetAmount)} today` : `${returns.length} returns recorded`}</span>
           </div>
         </div>
 
@@ -166,7 +175,7 @@ export default function Dashboard() {
             <div>
               <span className="text-xs font-semibold text-[#77776D] block">Net Cash Flow</span>
               <p className="font-serif text-2xl md:text-3xl font-bold text-[#252A26] mt-1">
-                {netCashFlow !== 0 ? pkr(netCashFlow) : 'Rs 3,630,000'}
+                {pkr(netCashFlow)}
               </p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#F3EBDD] flex items-center justify-center text-[#153C32] shrink-0">
@@ -174,13 +183,12 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-[#287A50]">
-            <span>↑ Rs 230,000 today</span>
+            <span>{todayNet > 0 ? `↑ ${pkr(todayNet)} today` : 'Reconciled ledger'}</span>
           </div>
         </div>
       </div>
 
-      {/* Event Progress Card matching reference:
-          Progress bar with 4 sub-metrics (Invitations, Guests, Gifts & Cash, Reconciliation) */}
+      {/* Event Progress Card */}
       <div className="card p-5 md:p-6 bg-white border border-[#E7E0D4] shadow-card rounded-2xl">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-serif text-lg font-bold text-[#252A26]">Event Progress</h3>
@@ -203,7 +211,7 @@ export default function Dashboard() {
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] text-[#77776D] truncate">Invitations</span>
-              <b className="font-serif text-sm text-[#252A26]">{guests.length > 0 ? guests.length : 248}/300</b>
+              <b className="font-serif text-sm text-[#252A26]">{guests.length} / {totalCapacity}</b>
             </div>
           </div>
 
@@ -213,7 +221,7 @@ export default function Dashboard() {
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] text-[#77776D] truncate">Guests</span>
-              <b className="font-serif text-sm text-[#252A26]">{guests.length > 0 ? guests.length : 248}/300</b>
+              <b className="font-serif text-sm text-[#252A26]">{guests.length} / {totalCapacity}</b>
             </div>
           </div>
 
@@ -223,7 +231,7 @@ export default function Dashboard() {
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] text-[#77776D] truncate">Gifts & Cash</span>
-              <b className="font-serif text-sm text-[#252A26] truncate block">{totalReceived > 0 ? pkr(totalReceived) : 'Rs 3,750,000'}</b>
+              <b className="font-serif text-sm text-[#252A26] truncate block">{pkr(totalReceived)}</b>
             </div>
           </div>
 
@@ -233,7 +241,7 @@ export default function Dashboard() {
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] text-[#77776D] truncate">Reconciliation</span>
-              <b className="font-serif text-sm text-[#252A26]">In Progress</b>
+              <b className="font-serif text-sm text-[#252A26]">{rec.length > 0 ? 'Active' : 'Awaiting gifts'}</b>
             </div>
           </div>
         </div>
@@ -255,7 +263,7 @@ export default function Dashboard() {
             <div className="divide-y divide-[#E7E0D4]/70 flex-1">
               {rec.slice(0, 5).map(t => {
                 const person = people.find(x => x.id === t.personId)
-                const guestName = person?.name || 'Ahmed Khan'
+                const guestName = person?.name || 'Guest'
                 return (
                   <div key={t.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                     <div className="flex items-center gap-3 min-w-0">
@@ -279,59 +287,19 @@ export default function Dashboard() {
               })}
             </div>
           ) : (
-            /* Elegant Reference Demo Sample List when live data is empty */
-            <div className="divide-y divide-[#E7E0D4]/70 flex-1">
-              <div className="py-3 flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#153C32] text-white flex items-center justify-center font-bold text-xs shrink-0">
-                    AK
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#252A26]">Ahmed Khan added a gift entry – <b className="font-serif text-[#287A50]">Rs 50,000</b></p>
-                    <span className="text-[11px] text-[#77776D]">Family · Main Entrance</span>
-                  </div>
-                </div>
-                <span className="text-[11px] text-[#77776D]">2 min ago</span>
-              </div>
-
-              <div className="py-3 flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#C7A56A] text-[#0F2F28] flex items-center justify-center font-bold text-xs shrink-0">
-                    FA
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#252A26]">Fatima Ali registered as a guest</p>
-                    <span className="text-[11px] text-[#77776D]">Friend · Walima</span>
-                  </div>
-                </div>
-                <span className="text-[11px] text-[#77776D]">5 min ago</span>
-              </div>
-
-              <div className="py-3 flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#FAF7F0] border border-[#E7E0D4] text-[#153C32] flex items-center justify-center font-bold text-xs shrink-0">
-                    C1
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#252A26]">Counter 1 updated cash entry – <b className="font-serif text-[#287A50]">Rs 25,000</b></p>
-                    <span className="text-[11px] text-[#77776D]">Bilal Tariq · Registration</span>
-                  </div>
-                </div>
-                <span className="text-[11px] text-[#77776D]">12 min ago</span>
-              </div>
-
-              <div className="py-3 flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#FAF7F0] border border-[#E7E0D4] text-[#77776D] flex items-center justify-center font-bold text-xs shrink-0">
-                    ⚙
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#252A26]">Event settings updated by admin</p>
-                    <span className="text-[11px] text-[#77776D]">PIN Policy · Strict Mode</span>
-                  </div>
-                </div>
-                <span className="text-[11px] text-[#77776D]">1 hour ago</span>
-              </div>
+            <div className="py-12 flex flex-col items-center justify-center text-center text-[#77776D] flex-1">
+              <Gift size={32} className="text-[#C7A56A] opacity-60 mb-2" />
+              <p className="font-serif text-sm font-bold text-[#252A26]">No Gift Entries Recorded Yet</p>
+              <p className="text-xs text-[#77776D] mt-1 max-w-xs">
+                When gifts and salamii are entered at the counter or quick entry, live transactions will appear here.
+              </p>
+              <Link
+                to="/app/quick-entry"
+                className="btn btn-p text-xs !py-2 !px-4 mt-3 rounded-xl inline-flex items-center gap-1.5"
+              >
+                <Zap size={13} />
+                <span>Record First Gift</span>
+              </Link>
             </div>
           )}
         </div>

@@ -177,7 +177,7 @@ export function Events() {
 
                   <div className="flex items-center gap-3 mt-2 text-xs">
                     <span className="text-[#77776D]">
-                      Guests: <b className="text-[#252A26]">{s.guests || 248}</b>
+                      Guests: <b className="text-[#252A26]">{s.guests || 0}</b>
                     </span>
                     <span className="text-[#77776D]">
                       Received: <b className="font-serif text-[#287A50]">{pkr(s.amt)}</b>

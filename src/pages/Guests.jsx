@@ -213,7 +213,7 @@ export default function Guests() {
               : 'bg-white border border-[#E8E0D1] text-[#77776E] hover:bg-[#F3EBDD]'
           }`}
         >
-          All ({allEventGuests.length > 0 ? allEventGuests.length : 248})
+          All ({allEventGuests.length})
         </button>
 
         <button
@@ -224,7 +224,7 @@ export default function Guests() {
               : 'bg-white border border-[#E8E0D1] text-[#77776E] hover:bg-[#F3EBDD]'
           }`}
         >
-          Invited ({invitedCount > 0 ? invitedCount : 240})
+          Invited ({invitedCount})
         </button>
 
         <button
@@ -235,7 +235,7 @@ export default function Guests() {
               : 'bg-white border border-[#E8E0D1] text-[#77776E] hover:bg-[#F3EBDD]'
           }`}
         >
-          Confirmed ({confirmedCount > 0 ? confirmedCount : 160})
+          Confirmed ({confirmedCount})
         </button>
 
         <button
@@ -246,7 +246,7 @@ export default function Guests() {
               : 'bg-white border border-[#E7E0D4] text-[#77776D] hover:bg-[#F3EBDD]'
           }`}
         >
-          Pending ({pendingCount > 0 ? pendingCount : 30})
+          Pending ({pendingCount})
         </button>
 
         {/* VIP Seating Toggle Pill */}
@@ -494,57 +494,25 @@ export default function Guests() {
                     </td>
                   </tr>
                 ) : (
-                  /* Demo Fallback Rows if event guestlist is brand new */
-                  [
-                    { id: 'd1', name: 'Ahmed Khan', phone: '0300-1234567', relation: 'Family', status: 'Confirmed' },
-                    { id: 'd2', name: 'Fatima Ali', phone: '0321-7654321', relation: 'Friend', status: 'Confirmed' },
-                    { id: 'd3', name: 'Bilal Ahmed', phone: '0333-9876543', relation: 'Friend', status: 'Pending' },
-                    { id: 'd4', name: 'Ayesha Malik', phone: '0305-4463221', relation: 'Family', status: 'Confirmed' },
-                    { id: 'd5', name: 'Usman Tariq', phone: '0312-5566778', relation: 'Friend', status: 'Invited' },
-                    { id: 'd6', name: 'Hira Shah', phone: '0345-1122354', relation: 'Family', status: 'Confirmed' }
-                  ].map((demo, idx) => (
-                    <tr key={demo.id} className="hover:bg-[#FAF7F0]/60 transition">
-                      <td className="p-3.5 pl-5 text-[#77776D] font-mono">{idx + 1}</td>
-                      <td className="p-3.5 font-medium text-[#252A26]">{demo.name}</td>
-                      <td className="text-[#77776D] font-mono">{demo.phone}</td>
-                      <td className="text-[#252A26] font-medium">{demo.relation}</td>
-                      <td>
-                        <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold ${
-                          demo.status === 'Confirmed' ? 'bg-[#DCE8DC] text-[#287A50]' :
-                          demo.status === 'Pending' ? 'bg-[#FEF3C7] text-[#B7791F]' :
-                          'bg-[#E0E7FF] text-[#3730A3]'
-                        }`}>
-                          {demo.status}
+                  /* Clean Empty State when no guests added yet */
+                  <tr>
+                    <td colSpan={6} className="text-center py-14 text-[#77776D]">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <Users size={32} className="text-[#C7A56A] opacity-60" />
+                        <span className="font-serif font-bold text-base text-[#252A26]">No Guests Added Yet</span>
+                        <span className="text-xs text-[#77776D] max-w-sm">
+                          Add your first invited relative or friend to start tracking RSVPs and salamii records.
                         </span>
-                      </td>
-                      <td className="text-right pr-5">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => {
-                              setF({ ...blank, name: demo.name, phone: demo.phone, relation: demo.relation, status: demo.status })
-                              setShowAddForm(true)
-                              window.scrollTo({ top: 0, behavior: 'smooth' })
-                            }}
-                            className="p-1.5 text-[#77776D] hover:text-[#252A26] hover:bg-[#F3EBDD] rounded-lg transition"
-                            title="Add as Guest"
-                          >
-                            <Eye size={14} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setF({ ...blank, name: demo.name, phone: demo.phone, relation: demo.relation, status: demo.status })
-                              setShowAddForm(true)
-                              window.scrollTo({ top: 0, behavior: 'smooth' })
-                            }}
-                            className="p-1.5 text-[#77776D] hover:text-[#252A26] hover:bg-[#F3EBDD] rounded-lg transition"
-                            title="Edit & Save"
-                          >
-                            <Edit3 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        <button
+                          onClick={() => { setEditing(null); setF(blank); setShowAddForm(true); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                          className="btn btn-p text-xs !py-2 !px-4 mt-2 rounded-xl inline-flex items-center gap-1.5"
+                        >
+                          <UserPlus size={14} />
+                          <span>Add First Guest</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -554,7 +522,7 @@ export default function Guests() {
               <span>
                 {filteredGuests.length > 0
                   ? `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, filteredGuests.length)} of ${filteredGuests.length}`
-                  : `Showing 1-${paginatedGuests.length || 6} of ${filteredGuests.length || 6} sample guests`}
+                  : 'Showing 0 guests'}
               </span>
 
               <div className="flex items-center gap-1">

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   Phone, MapPin, HeartHandshake, ArrowDownLeft, ArrowUpRight, Scale,
-  Plus, Send, Search, User, X, Check
+  Plus, Send, Search, User, X, Check, Users
 } from 'lucide-react'
 import { useStore } from '../store'
 import { pkr, generateWhatsAppLink } from '../data'
@@ -47,13 +47,7 @@ export function People() {
     })
     .sort((a, b) => a.name.localeCompare(b.name))
 
-  // Demo representation if user currently has fewer than 4 people
-  const displayPeople = filtered.length > 0 ? filtered : [
-    { id: 'p1', name: 'Ahmed Khan', relation: 'Father', phone: '+92 300 1234567', category: 'Family' },
-    { id: 'p2', name: 'Fatima', relation: 'Mother', phone: '+92 301 7654321', category: 'Family' },
-    { id: 'p3', name: 'Usman Tariq', relation: 'Brother', phone: '+92 312 5566778', category: 'Family' },
-    { id: 'p4', name: 'Ayesha Malik', relation: 'Sister', phone: '+92 305 4453221', category: 'Family' }
-  ]
+  const displayPeople = filtered
 
   return (
     <div className="space-y-6 animate-pop">
@@ -106,51 +100,68 @@ export function People() {
       </div>
 
       {/* Cards Grid matching reference Panel 5 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {displayPeople.map(p => {
-          const { rec, ret, net } = getBalance(p.id)
-          return (
-            <Link
-              key={p.id}
-              to={`/app/people/${p.id}`}
-              className="card p-5 bg-white border border-[#E8E0D1] rounded-2xl shadow-card hover:border-[#063D32]/40 hover:shadow-elevated transition-all flex flex-col items-center text-center group"
-            >
-              {/* Avatar circle */}
-              <div className="w-14 h-14 rounded-full bg-[#FAF7EF] border border-[#E8E0D1] flex items-center justify-center text-[#063D32] font-serif font-bold text-lg mb-3 shadow-2xs group-hover:scale-105 transition-transform">
-                {p.name.charAt(0)}
-              </div>
+      {displayPeople.length === 0 ? (
+        <div className="card p-12 text-center text-[#77776E] bg-white border border-[#E8E0D1] rounded-2xl flex flex-col items-center justify-center">
+          <Users size={32} className="text-[#C7A56A] opacity-60 mb-2" />
+          <h3 className="font-serif text-lg font-bold text-[#202A25]">No People Found</h3>
+          <p className="text-xs text-[#77776E] mt-1 max-w-sm">
+            {q ? `No contacts match "${q}".` : 'Add family members and relatives to manage their individual salamii ledgers.'}
+          </p>
+          <button
+            onClick={() => setIsAddOpen(true)}
+            className="btn btn-p text-xs !py-2 !px-4 mt-3 rounded-xl inline-flex items-center gap-1.5 bg-[#063D32] text-white"
+          >
+            <Plus size={14} />
+            <span>Add Person</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {displayPeople.map(p => {
+            const { rec, ret, net } = getBalance(p.id)
+            return (
+              <Link
+                key={p.id}
+                to={`/app/people/${p.id}`}
+                className="card p-5 bg-white border border-[#E8E0D1] rounded-2xl shadow-card hover:border-[#063D32]/40 hover:shadow-elevated transition-all flex flex-col items-center text-center group"
+              >
+                {/* Avatar circle */}
+                <div className="w-14 h-14 rounded-full bg-[#FAF7EF] border border-[#E8E0D1] flex items-center justify-center text-[#063D32] font-serif font-bold text-lg mb-3 shadow-2xs group-hover:scale-105 transition-transform">
+                  {p.name.charAt(0)}
+                </div>
 
-              {/* Name & Relation */}
-              <h3 className="font-serif text-base font-bold text-[#202A25] group-hover:text-[#063D32] transition">
-                {p.name}
-              </h3>
-              <p className="text-xs text-[#77776E] mt-0.5">
-                {p.relation || 'Relative'}
-              </p>
+                {/* Name & Relation */}
+                <h3 className="font-serif text-base font-bold text-[#202A25] group-hover:text-[#063D32] transition">
+                  {p.name}
+                </h3>
+                <p className="text-xs text-[#77776E] mt-0.5">
+                  {p.relation || 'Relative'}
+                </p>
 
-              {/* Phone number */}
-              <p className="text-xs font-mono text-[#77776E] mt-2">
-                {p.phone || '+92 300 0000000'}
-              </p>
+                {/* Phone number */}
+                <p className="text-xs font-mono text-[#77776E] mt-2">
+                  {p.phone || '+92 300 0000000'}
+                </p>
 
-              {/* Category Pill Tag matching reference Panel 5 */}
-              <div className="mt-4 pt-3 border-t border-[#E8E0D1]/60 w-full flex items-center justify-between">
-                <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FAF7EF] text-[#063D32] border border-[#E8E0D1]">
-                  {p.category || 'Family'}
-                </span>
-
-                {net !== 0 ? (
-                  <span className={`text-[10px] font-bold ${net > 0 ? 'text-[#27845B]' : 'text-[#C64E48]'}`}>
-                    {net > 0 ? `+${pkr(net)}` : `-${pkr(Math.abs(net))}`}
+                {/* Category Pill Tag matching reference Panel 5 */}
+                <div className="mt-4 pt-3 border-t border-[#E8E0D1]/60 w-full flex items-center justify-between">
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#FAF7EF] text-[#063D32] border border-[#E8E0D1]">
+                    {p.category || 'Family'}
                   </span>
-                ) : (
-                  <span className="text-[10px] text-[#77776E]">0 records</span>
-                )}
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+
+                  {net !== 0 ? (
+                    <span className={`text-[10px] font-bold ${net > 0 ? 'text-[#27845B]' : 'text-[#C64E48]'}`}>
+                      {net > 0 ? `+${pkr(net)}` : `-${pkr(Math.abs(net))}`}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-[#77776E]">0 records</span>
+                  )}
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      )}
 
       {/* Add Person Modal */}
       {isAddOpen && (

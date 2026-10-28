@@ -746,25 +746,25 @@ export default function Reports() {
                 </h3>
 
                 <div className="space-y-3">
-                  {(topGivers.length > 0 ? topGivers : [
-                    ['Ahmed Khan', 200000],
-                    ['Fatima Ali', 180000],
-                    ['Usman Tariq', 150000],
-                    ['Ayesha Malik', 130000],
-                    ['Bilal Ahmed', 90000]
-                  ]).map(([name, amount], i) => (
-                    <div key={i} className="flex items-center justify-between text-xs py-1">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#153C32] text-[#FAF7F0] font-bold text-[10px] flex items-center justify-center shrink-0">
-                          {name.charAt(0)}
+                  {topGivers.length > 0 ? (
+                    topGivers.map(([name, amount], i) => (
+                      <div key={i} className="flex items-center justify-between text-xs py-1">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-[#153C32] text-[#FAF7F0] font-bold text-[10px] flex items-center justify-center shrink-0">
+                            {name.charAt(0)}
+                          </div>
+                          <span className="font-medium text-[#252A26] truncate max-w-[110px]">{name}</span>
                         </div>
-                        <span className="font-medium text-[#252A26] truncate max-w-[110px]">{name}</span>
+                        <span className="font-serif font-bold text-[#252A26] text-xs font-mono">
+                          {pkr(amount)}
+                        </span>
                       </div>
-                      <span className="font-serif font-bold text-[#252A26] text-xs font-mono">
-                        {pkr(amount)}
-                      </span>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-xs text-[#77776D] py-4 text-center">
+                      No gift entries recorded yet.
+                    </p>
+                  )}
                 </div>
               </div>
 
