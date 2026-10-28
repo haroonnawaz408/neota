@@ -110,10 +110,7 @@ export default function Landing() {
                 to="/login"
                 className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold border border-[#E8E0D1] bg-white text-[#202A25] hover:bg-[#F3EBDD] transition shadow-xs"
               >
-                <div className="w-5 h-5 rounded-full bg-[#FAF7EF] flex items-center justify-center text-[#063D32]">
-                  <Play size={10} className="fill-[#063D32] ml-0.5" />
-                </div>
-                <span>Watch Demo</span>
+                <span>Sign In</span>
               </Link>
             </div>
 
